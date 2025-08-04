@@ -3,9 +3,9 @@
     "configurations": [
         {
             "name": "🚀 Start All Services (Local)",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/start-services-local.sh",
+            "command": "${workspaceFolder}/scripts/start-services-local.sh",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -18,9 +18,9 @@
         },
         {
             "name": "🐳 Start All Services (Docker)",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "docker-compose",
+            "command": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d"],
             "console": "integratedTerminal",
             "presentation": {
@@ -101,9 +101,9 @@
         },
         {
             "name": "⚡ Debug Frontend (React)",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "npm",
+            "command": "npm",
             "args": ["start"],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/src/frontend",
@@ -118,9 +118,9 @@
         },
         {
             "name": "🔍 Health Check",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/health-check.sh",
+            "command": "${workspaceFolder}/scripts/health-check.sh",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -133,9 +133,9 @@
         },
         {
             "name": "🧪 Run Full Test Suite",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/run-tests.sh",
+            "command": "${workspaceFolder}/scripts/run-tests.sh",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -148,9 +148,9 @@
         },
         {
             "name": "🔍 Database: Connect to PostgreSQL",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "docker",
+            "command": "docker",
             "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project"],
             "console": "integratedTerminal",
             "presentation": {
@@ -164,9 +164,9 @@
         },
         {
             "name": "📊 Database: View Schema",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "docker",
+            "command": "docker",
             "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project", "-c", "\\dt"],
             "console": "integratedTerminal",
             "presentation": {
@@ -180,9 +180,9 @@
         },
         {
             "name": "🐳 Docker: Start PostgreSQL",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "docker-compose",
+            "command": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d", "postgres"],
             "console": "integratedTerminal",
             "presentation": {
@@ -196,9 +196,9 @@
         },
         {
             "name": "🐳 Docker: Start Backend",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "docker-compose",
+            "command": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d", "backend"],
             "console": "integratedTerminal",
             "presentation": {
@@ -212,9 +212,9 @@
         },
         {
             "name": "🐳 Docker: Start Frontend",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "docker-compose",
+            "command": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d", "frontend"],
             "console": "integratedTerminal",
             "presentation": {
@@ -228,9 +228,9 @@
         },
         {
             "name": "🐳 Docker: Stop All Services",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "docker-compose",
+            "command": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "down"],
             "console": "integratedTerminal",
             "presentation": {
@@ -244,9 +244,9 @@
         },
         {
             "name": "🛑 Stop Local Services",
-            "type": "node",
+            "type": "shell",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/stop-services-local.sh",
+            "command": "${workspaceFolder}/scripts/stop-services-local.sh",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
