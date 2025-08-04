@@ -1,0 +1,47 @@
+# LV Project - Cursor Rules
+
+## Project Overview
+This is a full-stack inventory management system that replaces Excel-based operations with a modern, database-driven web application.
+
+## Technology Stack
+- Frontend: React with TypeScript
+- Backend: FastAPI (Python)
+- Database: PostgreSQL
+- Charts: Recharts
+- Deployment: Docker + Docker Compose
+- AI Integration: NIA
+
+## Key Files and Directories
+- `src/backend/main.py` - FastAPI backend server
+- `src/frontend/src/App.tsx` - React main application
+- `src/frontend/src/components/Dashboard.tsx` - Analytics dashboard
+- `src/database/schema.sql` - PostgreSQL database schema
+- `scripts/migrate_excel_data.py` - Excel to database migration
+- `scripts/analyze_excel.py` - Excel file analysis
+- `docker/docker-compose.yml` - Docker configuration
+- `docs/MEGA_PROMPT.md` - Complete project specification
+
+## Development Guidelines
+1. Follow feature-driven development with commits like: `feat(FEATURE X): <description>`
+2. All changes must reference a specific feature
+3. Maintain atomic commits with clear descriptions
+4. Include comprehensive documentation
+5. Use NIA for code analysis and suggestions
+
+## Quick Commands
+- Start all services: `docker-compose -f docker/docker-compose.yml up -d`
+- Analyze Excel: `python3 scripts/analyze_excel.py`
+- Migrate data: `python3 scripts/migrate_excel_data.py`
+- Update NIA: `python3 nia_index/index_nia_final.py`
+
+## Current Status
+- ✅ Feature 1: ERD + Schema Development (COMPLETED)
+- ✅ Feature 2: Input Screen Replacement (COMPLETED)
+- ✅ Feature 3: Analytics & Home Dashboard (COMPLETED)
+
+## Next Priorities
+1. Complete frontend components (Inventory, Products, Sales pages)
+2. Connect FastAPI to actual PostgreSQL database
+3. Implement comprehensive form validation
+4. Add robust error handling and logging
+5. Implement unit and integration tests 

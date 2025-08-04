@@ -1,0 +1,176 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "🚀 Start All Services (Docker)",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/start-services.js",
+            "console": "integratedTerminal",
+            "env": {
+                "DOCKER_COMPOSE_FILE": "${workspaceFolder}/docker/docker-compose.yml"
+            }
+        },
+        {
+            "name": "🐍 Debug FastAPI Backend",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/backend/main.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src/backend",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src/backend"
+            },
+            "args": []
+        },
+        {
+            "name": "📊 Debug Excel Analysis",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/analyze_excel.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "🔄 Debug Data Migration",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/migrate_excel_data.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "🤖 Debug NIA Indexing",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/nia_index/index_nia_final.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "⚡ Debug Frontend (React)",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/frontend/node_modules/.bin/react-scripts",
+            "args": ["start"],
+            "cwd": "${workspaceFolder}/src/frontend",
+            "console": "integratedTerminal",
+            "env": {
+                "BROWSER": "none",
+                "REACT_APP_API_URL": "http://localhost:8000"
+            }
+        },
+        {
+            "name": "🧪 Run Backend Tests",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["-v", "src/backend/tests/"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src/backend",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src/backend"
+            }
+        },
+        {
+            "name": "🧪 Run Frontend Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/frontend/node_modules/.bin/react-scripts",
+            "args": ["test", "--watchAll=false"],
+            "cwd": "${workspaceFolder}/src/frontend",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "📦 Build Frontend",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/frontend/node_modules/.bin/react-scripts",
+            "args": ["build"],
+            "cwd": "${workspaceFolder}/src/frontend",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "🐳 Docker: Start PostgreSQL",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "up", "postgres", "-d"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "🐳 Docker: Start Backend",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "up", "backend", "-d"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "🐳 Docker: Start Frontend",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "up", "frontend", "-d"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "🐳 Docker: Stop All Services",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "down"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "🔍 Database: Connect to PostgreSQL",
+            "type": "node",
+            "request": "launch",
+            "program": "docker",
+            "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "📊 Database: View Schema",
+            "type": "node",
+            "request": "launch",
+            "program": "docker",
+            "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project", "-c", "\\dt"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "🚀 Full Stack Development",
+            "configurations": [
+                "🐳 Docker: Start PostgreSQL",
+                "🐳 Docker: Start Backend",
+                "🐳 Docker: Start Frontend"
+            ],
+            "stopAll": true
+        },
+        {
+            "name": "🧪 Run All Tests",
+            "configurations": [
+                "🧪 Run Backend Tests",
+                "🧪 Run Frontend Tests"
+            ],
+            "stopAll": true
+        }
+    ]
+} 
