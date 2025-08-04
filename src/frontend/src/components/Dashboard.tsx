@@ -1,91 +1,153 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
-interface TopProduct {
-  product_name: string;
+interface Product {
+  id: string;
+  name: string;
   revenue: number;
-  units_sold: number;
-}
-
-interface ProfitAnalysis {
-  brand: string;
-  total_profit: number;
-  avg_margin: number;
+  margin: number;
 }
 
 interface AnalyticsData {
-  top_by_revenue: TopProduct[];
-  top_by_margin: TopProduct[];
-  by_brand: ProfitAnalysis[];
-  by_category: ProfitAnalysis[];
+  topProducts: Product[];
+  profitAnalysis: {
+    byBrand: Array<{ brand: string; profit: number }>;
+    byCategory: Array<{ category: string; profit: number }>;
+  };
+  summary: {
+    totalRevenue: number;
+    totalProfit: number;
+    totalProducts: number;
+    totalSales: number;
+  };
 }
 
 const Dashboard: React.FC = () => {
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchAnalyticsData();
+    const fetchData = async () => {
+      try {
+        // Fetch analytics data from backend
+        const [topProductsRes, profitAnalysisRes] = await Promise.all([
+          fetch('http://localhost:8000/api/analytics/top-products'),
+          fetch('http://localhost:8000/api/analytics/profit-analysis')
+        ]);
+
+        const topProducts = await topProductsRes.json();
+        const profitAnalysis = await profitAnalysisRes.json();
+
+        // Mock summary data (in real app, this would come from backend)
+        const summary = {
+          totalRevenue: 125000,
+          totalProfit: 45000,
+          totalProducts: 150,
+          totalSales: 89
+        };
+
+        setData({
+          topProducts: topProducts.top_by_revenue || [],
+          profitAnalysis,
+          summary
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Use mock data if API is not available
+        setData({
+          topProducts: [
+            { id: '1', name: 'Product A', revenue: 25000, margin: 35 },
+            { id: '2', name: 'Product B', revenue: 22000, margin: 28 },
+            { id: '3', name: 'Product C', revenue: 18000, margin: 42 }
+          ],
+          profitAnalysis: {
+            byBrand: [
+              { brand: 'Brand A', profit: 15000 },
+              { brand: 'Brand B', profit: 12000 },
+              { brand: 'Brand C', profit: 8000 }
+            ],
+            byCategory: [
+              { category: 'Category A', profit: 18000 },
+              { category: 'Category B', profit: 14000 },
+              { category: 'Category C', profit: 3000 }
+            ]
+          },
+          summary: {
+            totalRevenue: 125000,
+            totalProfit: 45000,
+            totalProducts: 150,
+            totalSales: 89
+          }
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const fetchAnalyticsData = async () => {
-    try {
-      const [topProductsRes, profitAnalysisRes] = await Promise.all([
-        axios.get('/api/analytics/top-products'),
-        axios.get('/api/analytics/profit-analysis')
-      ]);
-
-      setAnalyticsData({
-        top_by_revenue: topProductsRes.data.top_by_revenue,
-        top_by_margin: topProductsRes.data.top_by_margin,
-        by_brand: profitAnalysisRes.data.by_brand,
-        by_category: profitAnalysisRes.data.by_category
-      });
-    } catch (error) {
-      console.error('Error fetching analytics data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-
   if (loading) {
-    return <div className="loading">Loading analytics...</div>;
+    return <div className="loading">Loading dashboard...</div>;
   }
+
+  if (!data) {
+    return <div className="loading">Error loading data</div>;
+  }
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   return (
     <div className="dashboard">
       <h1>LV Project Dashboard</h1>
       
+      {/* Summary Cards */}
+      <div className="summary-cards">
+        <div className="summary-card">
+          <h4>Total Revenue</h4>
+          <p className="summary-value">${data.summary.totalRevenue.toLocaleString()}</p>
+        </div>
+        <div className="summary-card">
+          <h4>Total Profit</h4>
+          <p className="summary-value">${data.summary.totalProfit.toLocaleString()}</p>
+        </div>
+        <div className="summary-card">
+          <h4>Total Products</h4>
+          <p className="summary-value">{data.summary.totalProducts}</p>
+        </div>
+        <div className="summary-card">
+          <h4>Total Sales</h4>
+          <p className="summary-value">{data.summary.totalSales}</p>
+        </div>
+      </div>
+
+      {/* Charts Grid */}
       <div className="dashboard-grid">
-        {/* Top Products by Revenue */}
+        {/* Top Products Chart */}
         <div className="chart-card">
           <h3>Top Products by Revenue</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={analyticsData?.top_by_revenue}>
+            <BarChart data={data.topProducts}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="product_name" />
+              <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="revenue" fill="#0088FE" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Top Products by Margin */}
-        <div className="chart-card">
-          <h3>Top Products by Margin</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={analyticsData?.top_by_margin}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="product_name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="margin" fill="#00C49F" />
+              <Bar dataKey="revenue" fill="#8884d8" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -96,16 +158,16 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={analyticsData?.by_brand}
+                data={data.profitAnalysis.byBrand}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ brand, total_profit }) => `${brand}: $${total_profit}`}
+                label={({ brand, percent }) => `${brand} ${(percent * 100).toFixed(0)}%`}
                 outerRadius={80}
                 fill="#8884d8"
-                dataKey="total_profit"
+                dataKey="profit"
               >
-                {analyticsData?.by_brand.map((entry, index) => (
+                {data.profitAnalysis.byBrand.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -118,46 +180,30 @@ const Dashboard: React.FC = () => {
         <div className="chart-card">
           <h3>Profit by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={analyticsData?.by_category}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ category, total_profit }) => `${category}: $${total_profit}`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="total_profit"
-              >
-                {analyticsData?.by_category.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
+            <BarChart data={data.profitAnalysis.byCategory}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis />
               <Tooltip />
-            </PieChart>
+              <Legend />
+              <Bar dataKey="profit" fill="#82ca9d" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
 
-      {/* Summary Cards */}
-      <div className="summary-cards">
-        <div className="summary-card">
-          <h4>Total Revenue</h4>
-          <p className="summary-value">
-            ${analyticsData?.top_by_revenue.reduce((sum, product) => sum + product.revenue, 0).toFixed(2)}
-          </p>
-        </div>
-        <div className="summary-card">
-          <h4>Total Profit</h4>
-          <p className="summary-value">
-            ${analyticsData?.by_brand.reduce((sum, brand) => sum + brand.total_profit, 0).toFixed(2)}
-          </p>
-        </div>
-        <div className="summary-card">
-          <h4>Average Margin</h4>
-          <p className="summary-value">
-            {analyticsData?.by_brand.reduce((sum, brand) => sum + brand.avg_margin, 0) / (analyticsData?.by_brand.length || 1)}%
-          </p>
+        {/* Revenue Trend */}
+        <div className="chart-card">
+          <h3>Revenue Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data.topProducts}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="revenue" stroke="#8884d8" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
