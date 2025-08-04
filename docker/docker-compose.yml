@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: lv_postgres
+    environment:
+      POSTGRES_DB: lv_project
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../src/database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - lv_network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ../src/backend
+      dockerfile: Dockerfile
+    container_name: lv_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/lv_project
+    depends_on:
+      - postgres
+    networks:
+      - lv_network
+    volumes:
+      - ../data:/app/data
+
+  # React Frontend
+  frontend:
+    build:
+      context: ../src/frontend
+      dockerfile: Dockerfile
+    container_name: lv_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - lv_network
+
+volumes:
+  postgres_data:
+
+networks:
+  lv_network:
+    driver: bridge 
