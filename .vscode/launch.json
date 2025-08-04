@@ -3,9 +3,10 @@
     "configurations": [
         {
             "name": "🚀 Start All Services (Local)",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "${workspaceFolder}/scripts/start-services-local.sh",
+            "program": "${workspaceFolder}/scripts/start-services-local.sh",
+            "runtimeExecutable": "/bin/bash",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -18,10 +19,11 @@
         },
         {
             "name": "🐳 Start All Services (Docker)",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "docker-compose",
+            "program": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -101,10 +103,11 @@
         },
         {
             "name": "⚡ Debug Frontend (React)",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "npm",
+            "program": "npm",
             "args": ["start"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/src/frontend",
             "presentation": {
@@ -118,9 +121,10 @@
         },
         {
             "name": "🔍 Health Check",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "${workspaceFolder}/scripts/health-check.sh",
+            "program": "${workspaceFolder}/scripts/health-check.sh",
+            "runtimeExecutable": "/bin/bash",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -133,9 +137,10 @@
         },
         {
             "name": "🧪 Run Full Test Suite",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "${workspaceFolder}/scripts/run-tests.sh",
+            "program": "${workspaceFolder}/scripts/run-tests.sh",
+            "runtimeExecutable": "/bin/bash",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -148,10 +153,11 @@
         },
         {
             "name": "🔍 Database: Connect to PostgreSQL",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "docker",
+            "program": "docker",
             "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -164,10 +170,11 @@
         },
         {
             "name": "📊 Database: View Schema",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "docker",
+            "program": "docker",
             "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project", "-c", "\\dt"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -180,10 +187,11 @@
         },
         {
             "name": "🐳 Docker: Start PostgreSQL",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "docker-compose",
+            "program": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d", "postgres"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -196,10 +204,11 @@
         },
         {
             "name": "🐳 Docker: Start Backend",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "docker-compose",
+            "program": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d", "backend"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -212,10 +221,11 @@
         },
         {
             "name": "🐳 Docker: Start Frontend",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "docker-compose",
+            "program": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "up", "-d", "frontend"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -228,10 +238,11 @@
         },
         {
             "name": "🐳 Docker: Stop All Services",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "docker-compose",
+            "program": "docker-compose",
             "args": ["-f", "docker/docker-compose.yml", "down"],
+            "runtimeExecutable": "/usr/bin/env",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
@@ -244,9 +255,10 @@
         },
         {
             "name": "🛑 Stop Local Services",
-            "type": "shell",
+            "type": "node",
             "request": "launch",
-            "command": "${workspaceFolder}/scripts/stop-services-local.sh",
+            "program": "${workspaceFolder}/scripts/stop-services-local.sh",
+            "runtimeExecutable": "/bin/bash",
             "console": "integratedTerminal",
             "presentation": {
                 "echo": true,
