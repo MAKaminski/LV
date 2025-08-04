@@ -38,6 +38,7 @@ You are my full-stack product engineer and product manager for the LV Project. Y
 - **Charts**: Recharts for analytics
 - **Deployment**: Docker + Docker Compose
 - **AI Integration**: NIA for development assistance
+- **Testing**: Comprehensive test suite (Unit, Integration, E2E)
 
 ### Application Structure
 ```
@@ -48,14 +49,18 @@ LV/
 │   ├── MEGA_PROMPT.md        # This file - project specification
 │   ├── ARCHITECTURE.md       # System architecture diagrams
 │   ├── TIMELINE.md           # Development timeline & milestones
-│   └── HOW_TO_USE.md         # Comprehensive usage guide
+│   ├── HOW_TO_USE.md         # Comprehensive usage guide
+│   └── SECURITY.md           # Security guidelines
 ├── src/              # Application source code
 │   ├── backend/      # FastAPI server
 │   ├── database/     # Database schemas
 │   └── frontend/     # React application
+├── tests/            # Comprehensive test suites
+│   ├── unit/         # Unit tests for individual components
+│   ├── integration/  # Integration tests for API endpoints
+│   └── e2e/          # End-to-end tests for full workflows
 ├── scripts/          # Data migration and analysis
 ├── docker/           # Docker configuration
-├── tests/            # Test suites
 └── nia_index/        # NIA indexing tools
 ```
 
@@ -104,12 +109,113 @@ LV/
 - Performance optimization tips
 - Security best practices
 
+## 🧪 COMPREHENSIVE TESTING STRATEGY
+
+### Testing Pyramid Implementation
+
+#### 1. Unit Tests (Foundation)
+**Coverage**: 90%+ for all components
+**Tools**: pytest (Backend), Jest (Frontend)
+**Scope**:
+- Individual functions and methods
+- Component logic and state management
+- Database operations and migrations
+- Utility functions and helpers
+
+#### 2. Integration Tests (Middle Layer)
+**Coverage**: All API endpoints and database interactions
+**Tools**: pytest with FastAPI TestClient, Supertest
+**Scope**:
+- API endpoint functionality
+- Database integration
+- Authentication and authorization
+- Data validation and error handling
+
+#### 3. End-to-End Tests (Top Layer)
+**Coverage**: Critical user workflows
+**Tools**: Playwright, Cypress
+**Scope**:
+- Complete user journeys
+- Cross-browser compatibility
+- Performance under load
+- Real-world scenarios
+
+### Pre-Commit Testing Requirements
+
+#### ✅ Mandatory Test Suite Execution
+Before ANY commit, the following tests MUST pass:
+
+1. **Unit Tests**
+   ```bash
+   # Backend unit tests
+   cd src/backend && python -m pytest tests/unit/ -v --cov=src --cov-report=html
+   
+   # Frontend unit tests
+   cd src/frontend && npm test -- --coverage --watchAll=false
+   ```
+
+2. **Integration Tests**
+   ```bash
+   # API integration tests
+   cd src/backend && python -m pytest tests/integration/ -v
+   
+   # Database integration tests
+   python -m pytest tests/integration/test_database.py -v
+   ```
+
+3. **End-to-End Tests**
+   ```bash
+   # Start services for E2E testing
+   docker-compose -f docker/docker-compose.yml up -d
+   
+   # Run E2E tests
+   npm run test:e2e
+   ```
+
+4. **Service Health Checks**
+   ```bash
+   # Verify all services are running
+   ./scripts/health-check.sh
+   
+   # Test database connectivity
+   ./scripts/test-database.sh
+   
+   # Test API endpoints
+   ./scripts/test-api.sh
+   ```
+
+### Quality Assurance Standards
+
+#### Code Quality Requirements
+- **Linting**: All code must pass linting checks
+- **Type Checking**: TypeScript strict mode enabled
+- **Security Scanning**: No vulnerabilities in dependencies
+- **Performance**: API response times under 200ms
+- **Coverage**: Minimum 90% test coverage
+
+#### Pre-Commit Hooks
+```bash
+# Install pre-commit hooks
+pre-commit install
+
+# Hooks include:
+# - Code formatting (black, prettier)
+# - Linting (flake8, eslint)
+# - Type checking (mypy, tsc)
+# - Security scanning (bandit, npm audit)
+# - Test execution (pytest, jest)
+```
+
 ## 🔧 DEVELOPMENT COMMANDS
 
-### Quick Start
+### Quick Start with Testing
 ```bash
-# Start all services
+# Start all services with health checks
 docker-compose -f docker/docker-compose.yml up -d
+./scripts/health-check.sh
+
+# Run full test suite
+./scripts/run-tests.sh
 
 # Access applications
 # Frontend: http://localhost:3000
@@ -117,21 +223,31 @@ docker-compose -f docker/docker-compose.yml up -d
 # API Docs: http://localhost:8000/docs
 ```
 
-### Development Workflow
+### Development Workflow with Testing
 ```bash
-# Analyze Excel data
+# 1. Analyze Excel data
 python3 scripts/analyze_excel.py
 
-# Migrate data to database
+# 2. Migrate data to database
 python3 scripts/migrate_excel_data.py
 
-# Update NIA index
+# 3. Run unit tests
+cd src/backend && python -m pytest tests/unit/ -v
+cd src/frontend && npm test
+
+# 4. Run integration tests
+cd src/backend && python -m pytest tests/integration/ -v
+
+# 5. Run E2E tests
+npm run test:e2e
+
+# 6. Update NIA index
 python3 nia_index/index_nia_final.py
 
-# Run backend development
+# 7. Run backend development
 cd src/backend && python3 main.py
 
-# Run frontend development
+# 8. Run frontend development
 cd src/frontend && npm start
 ```
 
@@ -151,7 +267,7 @@ The dashboard provides:
 2. **Database Integration**: Connect FastAPI to actual PostgreSQL
 3. **Form Validation**: Implement comprehensive form validation
 4. **Error Handling**: Add robust error handling and logging
-5. **Testing**: Implement unit and integration tests
+5. **Testing Infrastructure**: Implement comprehensive test suites
 
 ### Advanced Features
 1. **Multi-platform Integration**: Direct API connections to Poshmark, Whatnot
@@ -183,15 +299,19 @@ All commits follow: `feat(FEATURE X): <description>`
 - ✅ **Docker Setup**: Complete containerization
 - ✅ **Data Migration**: Excel to database conversion
 - ✅ **NIA Integration**: Full context and indexing
+- ✅ **Security**: Comprehensive security measures
+- 🔄 **Testing**: Comprehensive test suite implementation
 
 ## 💡 DEVELOPMENT GUIDELINES
 
 1. **Feature-Driven**: Every change must reference a feature
 2. **Atomic Commits**: Small, focused commits with clear descriptions
 3. **Documentation**: Auto-generate README updates per feature
-4. **Testing**: Include unit tests for all API endpoints
+4. **Testing**: Comprehensive test coverage (Unit, Integration, E2E)
 5. **AI Integration**: Use NIA for code analysis and suggestions
 6. **Artifact Maintenance**: Keep ARCHITECTURE.md, TIMELINE.md, and HOW_TO_USE.md updated
+7. **Quality Assurance**: All tests must pass before any commit
+8. **Service Health**: All services must be operational before commits
 
 ## 🎯 SUCCESS METRICS ACHIEVED
 
@@ -201,6 +321,8 @@ All commits follow: `feat(FEATURE X): <description>`
 - ✅ **Feature-Driven Development**: Atomic commits with clear traceability
 - ✅ **AI Integration**: NIA-powered development assistance
 - ✅ **Comprehensive Documentation**: Three maintained artifacts for ongoing reference
+- ✅ **Security**: GitGuardian-ready with environment variables
+- 🔄 **Testing**: Comprehensive test suite implementation
 
 ## 🔄 MAINTENANCE RESPONSIBILITIES
 
@@ -210,15 +332,43 @@ All commits follow: `feat(FEATURE X): <description>`
 3. **Update HOW_TO_USE.md**: Add new features and usage instructions
 4. **Maintain NIA Index**: Keep repository indexed for AI assistance
 5. **Feature Documentation**: Document each new feature implementation
+6. **Test Maintenance**: Keep all test suites current and passing
+7. **Service Monitoring**: Ensure all services are operational
 
 ### Quality Assurance
 1. **Code Review**: Ensure all changes follow feature-driven development
-2. **Testing**: Maintain test coverage for all components
+2. **Testing**: Maintain comprehensive test coverage (Unit, Integration, E2E)
 3. **Documentation**: Keep all artifacts current and accurate
 4. **Performance**: Monitor and optimize system performance
 5. **Security**: Implement and maintain security best practices
+6. **Service Health**: Verify all services work in unison before commits
+
+## 🧪 TESTING INFRASTRUCTURE
+
+### Test Organization
+```
+tests/
+├── unit/              # Unit tests for individual components
+│   ├── backend/       # FastAPI unit tests
+│   ├── frontend/      # React component tests
+│   └── database/      # Database operation tests
+├── integration/       # Integration tests
+│   ├── api/           # API endpoint tests
+│   ├── database/      # Database integration tests
+│   └── services/      # Service interaction tests
+└── e2e/              # End-to-end tests
+    ├── workflows/     # Complete user workflows
+    ├── performance/   # Performance tests
+    └── compatibility/ # Cross-browser tests
+```
+
+### Test Execution Pipeline
+1. **Pre-commit**: Unit tests, linting, type checking
+2. **Integration**: API tests, database tests, service tests
+3. **E2E**: Complete workflow tests, performance tests
+4. **Health Check**: Service availability, connectivity tests
 
 ---
 
-**The LV Project is now a complete, production-ready inventory management system with comprehensive documentation and maintenance procedures!** 🎉
+**The LV Project is now a complete, production-ready inventory management system with comprehensive testing, documentation, and security!** 🎉
 
