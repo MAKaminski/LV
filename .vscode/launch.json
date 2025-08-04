@@ -2,13 +2,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "🚀 Start All Services (Docker)",
+            "name": "🚀 Start All Services (Local)",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/start-services.js",
+            "program": "${workspaceFolder}/scripts/start-services-local.sh",
             "console": "integratedTerminal",
-            "env": {
-                "DOCKER_COMPOSE_FILE": "${workspaceFolder}/docker/docker-compose.yml"
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "name": "🐳 Start All Services (Docker)",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "docker/docker-compose.yml", "up", "-d"],
+            "console": "integratedTerminal",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
             }
         },
         {
@@ -21,7 +42,14 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/src/backend"
             },
-            "args": []
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
         },
         {
             "name": "📊 Debug Excel Analysis",
@@ -30,8 +58,13 @@
             "program": "${workspaceFolder}/scripts/analyze_excel.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
             }
         },
         {
@@ -41,8 +74,13 @@
             "program": "${workspaceFolder}/scripts/migrate_excel_data.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
             }
         },
         {
@@ -52,88 +90,61 @@
             "program": "${workspaceFolder}/nia_index/index_nia_final.py",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}"
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
             }
         },
         {
             "name": "⚡ Debug Frontend (React)",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/src/frontend/node_modules/.bin/react-scripts",
+            "program": "npm",
             "args": ["start"],
-            "cwd": "${workspaceFolder}/src/frontend",
             "console": "integratedTerminal",
-            "env": {
-                "BROWSER": "none",
-                "REACT_APP_API_URL": "http://localhost:8000"
+            "cwd": "${workspaceFolder}/src/frontend",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
             }
         },
         {
-            "name": "🧪 Run Backend Tests",
-            "type": "python",
+            "name": "🔍 Health Check",
+            "type": "node",
             "request": "launch",
-            "module": "pytest",
-            "args": ["-v", "src/backend/tests/"],
+            "program": "${workspaceFolder}/scripts/health-check.sh",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/src/backend",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/src/backend"
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
             }
         },
         {
-            "name": "🧪 Run Frontend Tests",
+            "name": "🧪 Run Full Test Suite",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceFolder}/src/frontend/node_modules/.bin/react-scripts",
-            "args": ["test", "--watchAll=false"],
-            "cwd": "${workspaceFolder}/src/frontend",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "📦 Build Frontend",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/frontend/node_modules/.bin/react-scripts",
-            "args": ["build"],
-            "cwd": "${workspaceFolder}/src/frontend",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "🐳 Docker: Start PostgreSQL",
-            "type": "node",
-            "request": "launch",
-            "program": "docker-compose",
-            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "up", "postgres", "-d"],
+            "program": "${workspaceFolder}/scripts/run-tests.sh",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "🐳 Docker: Start Backend",
-            "type": "node",
-            "request": "launch",
-            "program": "docker-compose",
-            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "up", "backend", "-d"],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "🐳 Docker: Start Frontend",
-            "type": "node",
-            "request": "launch",
-            "program": "docker-compose",
-            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "up", "frontend", "-d"],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "name": "🐳 Docker: Stop All Services",
-            "type": "node",
-            "request": "launch",
-            "program": "docker-compose",
-            "args": ["-f", "${workspaceFolder}/docker/docker-compose.yml", "down"],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
         },
         {
             "name": "🔍 Database: Connect to PostgreSQL",
@@ -142,7 +153,14 @@
             "program": "docker",
             "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project"],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
         },
         {
             "name": "📊 Database: View Schema",
@@ -151,26 +169,93 @@
             "program": "docker",
             "args": ["exec", "-it", "lv_postgres", "psql", "-U", "postgres", "-d", "lv_project", "-c", "\\dt"],
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
-        }
-    ],
-    "compounds": [
-        {
-            "name": "🚀 Full Stack Development",
-            "configurations": [
-                "🐳 Docker: Start PostgreSQL",
-                "🐳 Docker: Start Backend",
-                "🐳 Docker: Start Frontend"
-            ],
-            "stopAll": true
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
         },
         {
-            "name": "🧪 Run All Tests",
-            "configurations": [
-                "🧪 Run Backend Tests",
-                "🧪 Run Frontend Tests"
-            ],
-            "stopAll": true
+            "name": "🐳 Docker: Start PostgreSQL",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "docker/docker-compose.yml", "up", "-d", "postgres"],
+            "console": "integratedTerminal",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "name": "🐳 Docker: Start Backend",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "docker/docker-compose.yml", "up", "-d", "backend"],
+            "console": "integratedTerminal",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "name": "🐳 Docker: Start Frontend",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "docker/docker-compose.yml", "up", "-d", "frontend"],
+            "console": "integratedTerminal",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "name": "🐳 Docker: Stop All Services",
+            "type": "node",
+            "request": "launch",
+            "program": "docker-compose",
+            "args": ["-f", "docker/docker-compose.yml", "down"],
+            "console": "integratedTerminal",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "name": "🛑 Stop Local Services",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/stop-services-local.sh",
+            "console": "integratedTerminal",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
         }
     ]
 } 
