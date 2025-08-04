@@ -13,6 +13,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 import uuid
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # FastAPI app
 app = FastAPI(
@@ -30,8 +35,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Database configuration
-DATABASE_URL = "postgresql://postgres:password@localhost/lv_project"
+# Database configuration from environment variables
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:your_secure_password@localhost/lv_project")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

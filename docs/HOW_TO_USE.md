@@ -249,7 +249,7 @@ npm test -- --coverage
 #### Backend Configuration
 ```bash
 # Database connection
-DATABASE_URL=postgresql://postgres:password@localhost/lv_project
+DATABASE_URL=postgresql://postgres:your_password@localhost/lv_project
 
 # API settings
 API_HOST=0.0.0.0
@@ -272,9 +272,9 @@ BROWSER=none
 services:
   postgres:
     environment:
-      POSTGRES_DB: lv_project
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB:-lv_project}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-your_secure_password}
     ports:
       - "5432:5432"
 ```
@@ -389,7 +389,7 @@ const Dashboard = React.lazy(() => import('./components/Dashboard'));
 ### Database Security
 ```sql
 -- Create read-only user
-CREATE USER readonly WITH PASSWORD 'password';
+CREATE USER readonly WITH PASSWORD 'your_secure_password';
 GRANT CONNECT ON DATABASE lv_project TO readonly;
 GRANT USAGE ON SCHEMA public TO readonly;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly;
