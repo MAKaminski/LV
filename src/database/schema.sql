@@ -9,18 +9,6 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- CORE ENTITIES
 -- =====================================================
 
--- Products table (normalized from product information)
-CREATE TABLE products (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    item_inventory_number VARCHAR(50) UNIQUE NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    category_id UUID REFERENCES categories(id),
-    brand_id UUID REFERENCES brands(id),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Categories table
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -35,6 +23,18 @@ CREATE TABLE brands (
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Products table (normalized from product information)
+CREATE TABLE products (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    item_inventory_number VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category_id UUID REFERENCES categories(id),
+    brand_id UUID REFERENCES brands(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Users table (buyers and sellers)
@@ -99,11 +99,12 @@ CREATE TABLE order_items (
     order_id UUID NOT NULL REFERENCES orders(id),
     product_id UUID NOT NULL REFERENCES products(id),
     quantity INTEGER NOT NULL DEFAULT 1,
-    sold_price DECIMAL(10,2) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sales table (completed sales with profit tracking)
+-- Sales table (completed transactions)
 CREATE TABLE sales (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     product_id UUID NOT NULL REFERENCES products(id),
@@ -121,31 +122,26 @@ CREATE TABLE sales (
 );
 
 -- =====================================================
--- PLATFORM SPECIFIC DATA
+-- PLATFORM MANAGEMENT
 -- =====================================================
 
--- Platform Goals table (Poshmark, Whatnot, etc.)
+-- Platform Goals table (from Sheet2)
 CREATE TABLE platform_goals (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     product_id UUID NOT NULL REFERENCES products(id),
-    platform_name VARCHAR(50) NOT NULL,
+    platform_name VARCHAR(100) NOT NULL,
     goal_price DECIMAL(10,2),
-    floor_price DECIMAL(10,2),
-    platform_fee DECIMAL(10,2),
+    goal_quantity INTEGER,
+    notes TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- =====================================================
--- ADMINISTRATIVE DATA
--- =====================================================
-
--- Admin Costs table
+-- Admin Costs table (from Sheet2)
 CREATE TABLE admin_costs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    product_id UUID REFERENCES products(id),
-    cost_type VARCHAR(100),
-    amount DECIMAL(10,2),
+    cost_type VARCHAR(100) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
     description TEXT,
     date_incurred DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -155,32 +151,27 @@ CREATE TABLE admin_costs (
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 
--- Product indexes
 CREATE INDEX idx_products_item_inventory_number ON products(item_inventory_number);
 CREATE INDEX idx_products_category_id ON products(category_id);
 CREATE INDEX idx_products_brand_id ON products(brand_id);
 
--- Inventory indexes
 CREATE INDEX idx_inventory_product_id ON inventory(product_id);
 CREATE INDEX idx_inventory_is_listed ON inventory(is_listed);
 
--- Order indexes
 CREATE INDEX idx_orders_order_id ON orders(order_id);
 CREATE INDEX idx_orders_buyer_id ON orders(buyer_id);
 CREATE INDEX idx_orders_seller_id ON orders(seller_id);
 CREATE INDEX idx_orders_processed_date ON orders(processed_date);
 
--- Sales indexes
 CREATE INDEX idx_sales_product_id ON sales(product_id);
 CREATE INDEX idx_sales_date_sold ON sales(date_sold);
 CREATE INDEX idx_sales_order_id ON sales(order_id);
 
--- Platform goals indexes
 CREATE INDEX idx_platform_goals_product_id ON platform_goals(product_id);
 CREATE INDEX idx_platform_goals_platform_name ON platform_goals(platform_name);
 
 -- =====================================================
--- TRIGGERS FOR UPDATED_AT
+-- TRIGGERS AND FUNCTIONS
 -- =====================================================
 
 -- Function to update updated_at timestamp
@@ -192,7 +183,7 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Apply triggers to all tables with updated_at
+-- Triggers for updated_at columns
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_inventory_updated_at BEFORE UPDATE ON inventory FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -200,20 +191,20 @@ CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders FOR EACH ROW EXE
 CREATE TRIGGER update_platform_goals_updated_at BEFORE UPDATE ON platform_goals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================
--- SAMPLE DATA INSERTION
+-- SAMPLE DATA
 -- =====================================================
 
 -- Insert sample categories
 INSERT INTO categories (name, description) VALUES
 ('Clothing', 'Apparel and fashion items'),
-('Accessories', 'Jewelry, bags, and accessories'),
+('Accessories', 'Jewelry, bags, and fashion accessories'),
 ('Home & Garden', 'Home decor and garden items'),
 ('Electronics', 'Electronic devices and gadgets'),
-('Books & Media', 'Books, DVDs, and media');
+('Designer', 'High-end designer items');
 
 -- Insert sample brands
 INSERT INTO brands (name, description) VALUES
-('LaceLuxx', 'Main brand for the business'),
-('Generic', 'Generic or unbranded items'),
-('Vintage', 'Vintage and retro items'),
-('Designer', 'High-end designer items'); 
+('LaceLuxx', 'Premium fashion brand'),
+('Generic', 'Generic and unbranded items'),
+('Designer', 'High-end designer brands'),
+('Vintage', 'Vintage and retro items'); 

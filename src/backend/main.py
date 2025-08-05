@@ -6,7 +6,7 @@ Feature 2: Input Screen Replacement
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, DateTime, Text, ForeignKey
+from sqlalchemy import create_engine, Column, String, Integer, Float, Boolean, DateTime, Text, ForeignKey, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
@@ -36,7 +36,7 @@ app.add_middleware(
 )
 
 # Database configuration from environment variables
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:your_secure_password@localhost/lv_project")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://makaminski1337@localhost/lv_project")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -46,7 +46,6 @@ class ProductBase(BaseModel):
     item_inventory_number: str
     name: str
     description: Optional[str] = None
-    category_id: Optional[str] = None
     brand_id: Optional[str] = None
 
 class ProductCreate(ProductBase):
@@ -134,7 +133,6 @@ def get_products(skip: int = 0, limit: int = 100, db: Session = Depends(get_db))
             "item_inventory_number": "LV001",
             "name": "Sample Product",
             "description": "A sample product",
-            "category_id": None,
             "brand_id": None,
             "created_at": datetime.now(),
             "updated_at": datetime.now()
@@ -161,7 +159,6 @@ def get_product(product_id: str, db: Session = Depends(get_db)):
         "item_inventory_number": "LV001",
         "name": "Sample Product",
         "description": "A sample product",
-        "category_id": None,
         "brand_id": None,
         "created_at": datetime.now(),
         "updated_at": datetime.now()
@@ -232,34 +229,149 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
 @app.get("/api/analytics/top-products")
 def get_top_products(db: Session = Depends(get_db)):
     """Get top selling products by revenue"""
-    return {
-        "top_by_revenue": [
-            {"product_name": "Product A", "revenue": 1500.00, "units_sold": 30},
-            {"product_name": "Product B", "revenue": 1200.00, "units_sold": 24},
-            {"product_name": "Product C", "revenue": 900.00, "units_sold": 18}
-        ],
-        "top_by_margin": [
-            {"product_name": "Product A", "margin": 80.5, "profit": 1200.00},
-            {"product_name": "Product B", "margin": 75.2, "profit": 900.00},
-            {"product_name": "Product C", "margin": 70.1, "profit": 630.00}
+    try:
+        # Query top products by revenue from sales
+        query = text("""
+        SELECT 
+            p.name as product_name,
+            COALESCE(SUM(s.sell_price * s.quantity_sold), 0) as revenue,
+            COALESCE(SUM(s.quantity_sold), 0) as units_sold
+        FROM products p
+        LEFT JOIN sales s ON p.id = s.product_id
+        GROUP BY p.id, p.name
+        ORDER BY revenue DESC
+        LIMIT 10
+        """)
+        
+        result = db.execute(query)
+        top_by_revenue = [
+            {
+                "product_name": row.product_name,
+                "revenue": float(row.revenue),
+                "units_sold": int(row.units_sold)
+            }
+            for row in result
         ]
-    }
+        
+        return {"top_by_revenue": top_by_revenue}
+    except Exception as e:
+        print(f"Error in get_top_products: {e}")
+        return {"top_by_revenue": []}
 
 @app.get("/api/analytics/profit-analysis")
 def get_profit_analysis(db: Session = Depends(get_db)):
-    """Get profit analysis by brand and category"""
-    return {
-        "by_brand": [
-            {"brand": "LaceLuxx", "total_profit": 2500.00, "avg_margin": 75.5},
-            {"brand": "Generic", "total_profit": 1800.00, "avg_margin": 65.2},
-            {"brand": "Designer", "total_profit": 3200.00, "avg_margin": 85.1}
-        ],
-        "by_category": [
-            {"category": "Clothing", "total_profit": 2000.00, "avg_margin": 70.5},
-            {"category": "Accessories", "total_profit": 1500.00, "avg_margin": 80.2},
-            {"category": "Home & Garden", "total_profit": 1000.00, "avg_margin": 65.8}
+    """Get profit analysis by brand (categories removed from schema)"""
+    try:
+        # Query profit by brand
+        brand_query = text("""
+        SELECT 
+            b.name as brand,
+            COALESCE(SUM(s.net_profit_loss), 0) as total_profit,
+            COALESCE(AVG(s.percent_profit), 0) as avg_margin,
+            COUNT(s.id) as total_sales
+        FROM brands b
+        LEFT JOIN products p ON b.id = p.brand_id
+        LEFT JOIN sales s ON p.id = s.product_id
+        GROUP BY b.id, b.name
+        ORDER BY total_profit DESC
+        """)
+        
+        brand_result = db.execute(brand_query)
+        by_brand = [
+            {
+                "brand": row.brand,
+                "total_profit": float(row.total_profit),
+                "avg_margin": float(row.avg_margin),
+                "total_sales": int(row.total_sales)
+            }
+            for row in brand_result
         ]
-    }
+        
+        # Since categories table was removed, we'll provide a summary instead
+        summary_query = text("""
+        SELECT 
+            COUNT(DISTINCT p.id) as total_products,
+            COUNT(s.id) as total_sales,
+            COALESCE(SUM(s.net_profit_loss), 0) as total_profit,
+            COALESCE(AVG(s.percent_profit), 0) as avg_margin
+        FROM products p
+        LEFT JOIN sales s ON p.id = s.product_id
+        """)
+        
+        summary_result = db.execute(summary_query).fetchone()
+        summary = {
+            "total_products": int(summary_result.total_products) if summary_result else 0,
+            "total_sales": int(summary_result.total_sales) if summary_result else 0,
+            "total_profit": float(summary_result.total_profit) if summary_result else 0,
+            "avg_margin": float(summary_result.avg_margin) if summary_result else 0
+        }
+        
+        return {
+            "by_brand": by_brand,
+            "summary": summary
+        }
+    except Exception as e:
+        print(f"Error in get_profit_analysis: {e}")
+        return {
+            "by_brand": [],
+            "summary": {
+                "total_products": 0,
+                "total_sales": 0,
+                "total_profit": 0,
+                "avg_margin": 0
+            }
+        }
+
+@app.get("/api/analytics/summary")
+def get_analytics_summary(db: Session = Depends(get_db)):
+    """Get summary statistics"""
+    try:
+        # Total revenue
+        revenue_query = text("""
+        SELECT COALESCE(SUM(s.sell_price * s.quantity_sold), 0) as total_revenue
+        FROM sales s
+        """)
+        revenue_result = db.execute(revenue_query).fetchone()
+        total_revenue = float(revenue_result.total_revenue) if revenue_result else 0
+        
+        # Total profit
+        profit_query = text("""
+        SELECT COALESCE(SUM(s.net_profit_loss), 0) as total_profit
+        FROM sales s
+        """)
+        profit_result = db.execute(profit_query).fetchone()
+        total_profit = float(profit_result.total_profit) if profit_result else 0
+        
+        # Total products
+        products_query = text("""
+        SELECT COUNT(*) as total_products
+        FROM products
+        """)
+        products_result = db.execute(products_query).fetchone()
+        total_products = int(products_result.total_products) if products_result else 0
+        
+        # Total sales
+        sales_query = text("""
+        SELECT COUNT(*) as total_sales
+        FROM sales
+        """)
+        sales_result = db.execute(sales_query).fetchone()
+        total_sales = int(sales_result.total_sales) if sales_result else 0
+        
+        return {
+            "totalRevenue": total_revenue,
+            "totalProfit": total_profit,
+            "totalProducts": total_products,
+            "totalSales": total_sales
+        }
+    except Exception as e:
+        print(f"Error in get_analytics_summary: {e}")
+        return {
+            "totalRevenue": 0,
+            "totalProfit": 0,
+            "totalProducts": 0,
+            "totalSales": 0
+        }
 
 if __name__ == "__main__":
     import uvicorn

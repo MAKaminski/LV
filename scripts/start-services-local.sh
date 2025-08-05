@@ -33,8 +33,8 @@ print_warning() {
     echo -e "${YELLOW}⚠️  $1${NC}"
 }
 
-# Check if we're in the right directory
-if [ ! -f "docs/MEGA_PROMPT.md" ]; then
+# Check if we're in the right directory (updated for current structure)
+if [ ! -f "docs/ANALYTICS_MEGA_PROMPT.md" ] && [ ! -f "context/project-overview.md" ]; then
     print_status 1 "Please run this script from the LV project root directory"
 fi
 

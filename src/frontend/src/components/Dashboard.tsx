@@ -40,6 +40,21 @@ const Dashboard: React.FC = () => {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Default data structure to prevent undefined errors
+  const defaultData: AnalyticsData = {
+    topProducts: [],
+    profitAnalysis: {
+      byBrand: [],
+      byCategory: []
+    },
+    summary: {
+      totalRevenue: 0,
+      totalProfit: 0,
+      totalProducts: 0,
+      totalSales: 0
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -52,17 +67,16 @@ const Dashboard: React.FC = () => {
         const topProducts = await topProductsRes.json();
         const profitAnalysis = await profitAnalysisRes.json();
 
-        // Mock summary data (in real app, this would come from backend)
-        const summary = {
-          totalRevenue: 125000,
-          totalProfit: 45000,
-          totalProducts: 150,
-          totalSales: 89
-        };
+        // Fetch summary data from backend
+        const summaryRes = await fetch('http://localhost:8000/api/analytics/summary');
+        const summary = await summaryRes.json();
 
         setData({
           topProducts: topProducts.top_by_revenue || [],
-          profitAnalysis,
+          profitAnalysis: {
+            byBrand: profitAnalysis.by_brand || [],
+            byCategory: profitAnalysis.by_category || []
+          },
           summary
         });
       } catch (error) {
@@ -105,11 +119,10 @@ const Dashboard: React.FC = () => {
     return <div className="loading">Loading dashboard...</div>;
   }
 
-  if (!data) {
-    return <div className="loading">Error loading data</div>;
-  }
-
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+  
+  // Use default data if data is null to prevent undefined errors
+  const displayData = data || defaultData;
 
   return (
     <div className="dashboard">
@@ -119,19 +132,19 @@ const Dashboard: React.FC = () => {
       <div className="summary-cards">
         <div className="summary-card">
           <h4>Total Revenue</h4>
-          <p className="summary-value">${data.summary.totalRevenue.toLocaleString()}</p>
+          <p className="summary-value">${displayData.summary.totalRevenue.toLocaleString()}</p>
         </div>
         <div className="summary-card">
           <h4>Total Profit</h4>
-          <p className="summary-value">${data.summary.totalProfit.toLocaleString()}</p>
+          <p className="summary-value">${displayData.summary.totalProfit.toLocaleString()}</p>
         </div>
         <div className="summary-card">
           <h4>Total Products</h4>
-          <p className="summary-value">{data.summary.totalProducts}</p>
+          <p className="summary-value">{displayData.summary.totalProducts}</p>
         </div>
         <div className="summary-card">
           <h4>Total Sales</h4>
-          <p className="summary-value">{data.summary.totalSales}</p>
+          <p className="summary-value">{displayData.summary.totalSales}</p>
         </div>
       </div>
 
@@ -141,7 +154,7 @@ const Dashboard: React.FC = () => {
         <div className="chart-card">
           <h3>Top Products by Revenue</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data.topProducts}>
+            <BarChart data={displayData.topProducts || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
@@ -158,7 +171,7 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={data.profitAnalysis.byBrand}
+                data={displayData.profitAnalysis.byBrand || []}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
@@ -167,7 +180,7 @@ const Dashboard: React.FC = () => {
                 fill="#8884d8"
                 dataKey="profit"
               >
-                {data.profitAnalysis.byBrand.map((entry, index) => (
+                {(displayData.profitAnalysis.byBrand || []).map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -180,7 +193,7 @@ const Dashboard: React.FC = () => {
         <div className="chart-card">
           <h3>Profit by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data.profitAnalysis.byCategory}>
+            <BarChart data={displayData.profitAnalysis.byCategory || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="category" />
               <YAxis />
@@ -195,7 +208,7 @@ const Dashboard: React.FC = () => {
         <div className="chart-card">
           <h3>Revenue Trend</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data.topProducts}>
+            <LineChart data={displayData.topProducts || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />

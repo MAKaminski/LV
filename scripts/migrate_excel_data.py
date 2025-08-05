@@ -47,8 +47,8 @@ class ExcelDataMigrator:
         return {
             'host': os.getenv('DB_HOST', 'localhost'),
             'database': os.getenv('POSTGRES_DB', 'lv_project'),
-            'user': os.getenv('POSTGRES_USER', 'postgres'),
-            'password': os.getenv('POSTGRES_PASSWORD', 'your_secure_password'),
+            'user': os.getenv('POSTGRES_USER', 'makaminski1337'),
+            'password': os.getenv('POSTGRES_PASSWORD', ''),
             'port': int(os.getenv('DB_PORT', '5432'))
         }
 

@@ -6,7 +6,7 @@ A full-stack inventory management system designed to replace manual Excel-based 
 
 ### ✅ Feature 1: ERD + Schema Development
 - **Normalized PostgreSQL database** with proper relationships
-- **Excel data migration** from LaceLuxx Inventory file
+- **CSV data migration** from Platform Luxx Base Data
 - **Audit trail** for all transactions
 - **Performance optimized** with proper indexing
 
@@ -28,7 +28,7 @@ A full-stack inventory management system designed to replace manual Excel-based 
 LV/
 ├── context/           # NIA context and project documentation
 ├── data/             # Data files and analysis results
-│   └── inputs/       # Excel input files
+│   └── inputs/       # CSV input files
 ├── docs/             # Project documentation
 ├── src/              # Application source code
 │   ├── backend/      # FastAPI server
@@ -51,19 +51,25 @@ LV/
 
 ## 📊 Database Schema
 
-The system uses a normalized database design with the following core entities:
+The system uses a normalized database design optimized for CSV-based inventory data:
 
-- **Products**: Core product information with categories and brands
-- **Inventory**: Current stock levels and pricing
-- **Sales**: Transaction history with profit tracking
-- **Orders**: Order management with line items
-- **Users**: Buyer and seller management
-- **Platform Goals**: Multi-platform selling targets
+### Core Entities
+- **Users**: Seller and buyer management (126 users)
+- **Brands**: Luxury brand information (89 brands)
+- **Products**: Core product information with brand relationships (60 products)
+- **Inventory**: Current stock levels and pricing (60 records)
+- **Sales**: Transaction history with profit tracking (29 sales)
+
+### Data Migration
+- **Source**: Platform Luxx Base Data.csv (774 records)
+- **Brand Extraction**: Intelligent pattern matching for luxury brands
+- **Data Quality**: Handles various money formats and data inconsistencies
+- **Weekly Updates**: Automated migration scripts for regular updates
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose
+- PostgreSQL (local installation)
 - Python 3.9+
 - Node.js 16+
 
@@ -73,30 +79,40 @@ git clone <repository-url>
 cd LV
 ```
 
-### 2. Start the Application
+### 2. Database Setup
 ```bash
-# Start all services
-docker-compose -f docker/docker-compose.yml up -d
+# Create database
+createdb lv_project
 
-# Or start individual services
-docker-compose -f docker/docker-compose.yml up postgres
-docker-compose -f docker/docker-compose.yml up backend
-docker-compose -f docker/docker-compose.yml up frontend
+# Apply schema
+psql -d lv_project -f src/database/schema.sql
 ```
 
-### 3. Access the Application
+### 3. Migrate CSV Data
+```bash
+# Install dependencies
+pip install pandas psycopg2-binary python-dotenv
+
+# Run migration
+python3 scripts/simple_csv_migrate.py
+
+# Extract brands (if needed)
+python3 scripts/extract_brands.py
+```
+
+### 4. Start the Application
+```bash
+# Backend
+cd src/backend && python3 main.py
+
+# Frontend (in new terminal)
+cd src/frontend && npm start
+```
+
+### 5. Access the Application
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
-
-### 4. Migrate Excel Data
-```bash
-# Install dependencies
-pip install pandas psycopg2-binary openpyxl
-
-# Run migration
-python scripts/migrate_excel_data.py
-```
 
 ## 📈 Analytics Dashboard
 
@@ -105,7 +121,6 @@ The dashboard provides real-time insights including:
 - **Top Products by Revenue**: Bar chart showing highest revenue generators
 - **Top Products by Margin**: Profit margin analysis
 - **Profit by Brand**: Pie chart of brand performance
-- **Profit by Category**: Category-wise profit analysis
 - **Summary Cards**: Total revenue, profit, and average margin
 
 ## 🔧 Development
@@ -125,7 +140,7 @@ cd src/frontend && npm test
 ### Database Management
 ```bash
 # Connect to database
-docker exec -it lv_postgres psql -U postgres -d lv_project
+psql -d lv_project
 
 # View schema
 \dt
@@ -161,20 +176,22 @@ This project is fully integrated with NIA for AI-powered development assistance:
 
 ## 📊 Data Migration
 
-The system includes comprehensive Excel data migration:
+The system includes comprehensive CSV data migration:
 
-1. **Analysis**: `scripts/analyze_excel.py` analyzes the Excel structure
-2. **Migration**: `scripts/migrate_excel_data.py` converts data to PostgreSQL
-3. **Validation**: Data integrity checks and error handling
-4. **Audit**: Complete audit trail of all migrations
+1. **Analysis**: `scripts/analyze_excel.py` analyzes the CSV structure
+2. **Migration**: `scripts/simple_csv_migrate.py` converts data to PostgreSQL
+3. **Brand Extraction**: `scripts/extract_brands.py` extracts brands from product names
+4. **Validation**: Data integrity checks and error handling
+5. **Weekly Updates**: `scripts/weekly_update.py` for routine data updates
 
 ## 🎯 Success Metrics
 
-- ✅ **Excel Replacement**: Complete migration from manual Excel to database
+- ✅ **CSV Migration**: Complete migration from Platform Luxx Base Data
 - ✅ **Real-time Analytics**: Automated dashboard replacing manual analysis
 - ✅ **Scalable Architecture**: Normalized database supporting growth
 - ✅ **Feature-Driven Development**: Atomic commits with clear traceability
 - ✅ **AI Integration**: NIA-powered development assistance
+- ✅ **Database Cleanup**: Removed unnecessary tables, optimized for CSV data
 
 ## 🔮 Future Enhancements
 
